@@ -18,7 +18,7 @@
         </div>
         <div id="messages" class="chat-body"></div>
         <div class="chat-footer">
-            <input type="text" id="messageInput" placeholder="Type a message as Admin...">
+            <input type="text" id="messageInput" placeholder="Type a message...">
             <input type="file" id="imageInput" accept="image/*">
             <button id="sendButton">Send</button>
         </div>
@@ -48,7 +48,7 @@
         const imageInput = document.getElementById("imageInput");
         const banButton = document.getElementById("banButton");
 
-        let username = prompt("Connor(Admin)");
+        let username = prompt("What Will Be your name??? :)");
         while (!username || username.trim() === "") {
             username = prompt("Username cannot be empty. Please enter a valid username:");
         }
