@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatroom (Beta)</title>
+    <title>Coventry Middle School Chatroom (Beta)</title>
     <link rel="stylesheet" href="style(Admin).css">
     <style>
         /* Existing styles remain unchanged */
@@ -14,22 +14,21 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            Chatroom (Beta)
+            Coventry Middle School Chatroom (Beta)
         </div>
         <div id="messages" class="chat-body"></div>
         <div class="chat-footer">
             <input type="text" id="messageInput" placeholder="Type a message as Admin...">
             <input type="file" id="imageInput" accept="image/*">
             <button id="sendButton">Send</button>
-            <button id="clearButton">Clear Chat</button>
+            <button id="clearButton">Clear</button>
             <button id="banButton">Ban Users</button>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getDatabase, ref, push, set, onChildAdded, remove, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
+    
         const firebaseConfig = {
             apiKey: "AIzaSyBMm-1XfT7zRhw07avgB7v_2s6EZ50EFl0",
             authDomain: "chatroom-bb752.firebaseapp.com",
@@ -40,24 +39,37 @@
             measurementId: "G-YDJ20S5NWH",
             databaseURL: "https://chatroom-bb752-default-rtdb.firebaseio.com/"
         };
-
+    
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-
+    
         const messagesContainer = document.getElementById("messages");
         const messageInput = document.getElementById("messageInput");
         const sendButton = document.getElementById("sendButton");
         const imageInput = document.getElementById("imageInput");
         const banButton = document.getElementById("banButton");
-
-        let username = prompt("Connor(Admin)");
-        while (!username || username.trim() === "") {
-            username = prompt("Username cannot be empty. Please enter a valid username:");
+    
+        let username = "";
+        let validPassword = false;
+    
+        // Prompt until a valid password is entered
+        while (!validPassword) {
+            let password = prompt("Please Enter Admin Password");
+    
+            if (password === "Noah45698") {
+                username = "Noah (Admin)";
+                validPassword = true;
+            } else if (password === "Connor45698") {
+                username = "Connor (Admin)";
+                validPassword = true;
+            } else {
+                alert("Invalid password. Please try again.");
+            }
         }
-
+    
         let imageUrl = null;
         const bannedUsersRef = ref(database, "bannedUsers");
-
+    
         function sendMessage() {
             const message = messageInput.value.trim();
             if (message !== "" || imageUrl !== null) {
@@ -74,80 +86,79 @@
                 imageUrl = null;
             }
         }
-
+    
         const messagesRef = ref(database, "messages");
-
+    
         onChildAdded(messagesRef, (snapshot) => {
             const messageData = snapshot.val();
             const messageElement = document.createElement("div");
             messageElement.classList.add("message");
-
+    
             const usernameElement = document.createElement("span");
             usernameElement.classList.add("username");
             usernameElement.textContent = messageData.username;
-
+    
             const timestampElement = document.createElement("span");
             timestampElement.classList.add("timestamp");
             const messageTimestamp = messageData.timestamp;
             const date = new Date(messageTimestamp);
             timestampElement.textContent = `${date.toLocaleTimeString()}`;
-
+    
             const messageContent = document.createElement("div");
             messageContent.textContent = messageData.message;
-
+    
             // Check if the user is banned  
             get(bannedUsersRef).then((snapshot) => {
                 const bannedUsers = snapshot.val() || {};
                 if (bannedUsers[messageData.username]) {
                     return; // Don't display messages from banned users  
                 }
-
+    
                 messageElement.appendChild(usernameElement);
                 messageElement.appendChild(messageContent);
                 messageElement.appendChild(timestampElement);
-
+    
                 if (messageData.imageUrl) {
                     const imgElement = document.createElement("img");
                     imgElement.src = messageData.imageUrl;
                     imgElement.classList.add("message-image");
                     messageElement.appendChild(imgElement);
                 }
-
+    
                 // Set message alignment  
                 if (messageData.username === username) {
                     messageElement.classList.add("right");
                 } else {
                     messageElement.classList.add("left");
                 }
-
+    
                 messagesContainer.appendChild(messageElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             });
         });
-
+    
         messageInput.addEventListener("keydown", (event) => {
             if (event.key === "Enter") {
                 sendMessage();
             }
         });
-
+    
         sendButton.addEventListener("click", sendMessage);
-
+    
         clearButton.addEventListener("click", () => {
             if (confirm("Are you sure you want to clear your messages? This action cannot be undone.")) {
                 const messagesRef = ref(database, "messages");
                 get(messagesRef).then((snapshot) => {
                     snapshot.forEach((childSnapshot) => {
                         const messageData = childSnapshot.val();
-                            remove(ref(database, `messages/${childSnapshot.key}`));
-                            window.location.reload();
-                        
+                        remove(ref(database, `messages/${childSnapshot.key}`));
+                        window.location.reload();
                     });
                 });
                 messagesContainer.innerHTML = ""; 
             }
         });
-
+    
         imageInput.addEventListener("change", () => {
             const file = imageInput.files[0];
             if (file) {
@@ -158,7 +169,7 @@
                 reader.readAsDataURL(file);
             }
         });
-
+    
         // Event listener for Ban List button  
         banButton.addEventListener("click", () => {
             const userToBan = prompt("Enter the username to ban:");
@@ -170,6 +181,7 @@
             }
         });
     </script>
+    
 </body>
 
 </html>
